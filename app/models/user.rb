@@ -1,14 +1,18 @@
 class User < ActiveRecord::Base
 
-	attr_reader :passowrd
+	attr_reader :password
 
 	validates :encrypted_password, presence: true
-	validates :username, presence: true, uniquesness: true
+	validates :username, presence: true, uniqueness: true
 	validates :password, length: {minimum: 2, allow_nil: true}
 
 	validate :fuck_john_boehner
 
 	before_validation :ensure_session_token
+
+	has_many :gift_requests
+	has_many :gift_responses
+	has_many :responses_to_gift_requests, through: :gift_requests, source: :gift_responses
 
 	def self.generate_session_token
 		SecureRandom::urlsafe_base64(16)
@@ -30,7 +34,7 @@ class User < ActiveRecord::Base
 	end
 
 	def ensure_session_token
-		self.session ||= self.class.generate_session_token
+		self.session_token ||= self.class.generate_session_token
 	end
 
 	def reset_session_token!
