@@ -12,7 +12,14 @@ class User < ActiveRecord::Base
 
 	has_many :gift_requests
 	has_many :gift_responses
+	has_many :votes_on_responses, through: :gift_responses, source: :votes
+	has_many :votes_on_requests, through: :gift_requests, source: :associated_votes
 	has_many :responses_to_gift_requests, through: :gift_requests, source: :gift_responses
+	has_many :created_flags, foreign_key: :flagger_id, class_name: "Flag"
+	has_many :flags_on_user, foreign_key: :flaggee_id, class_name: "Flag"
+	has_many :received_recommendations, through: :responses_to_gift_requests, source: :product
+	has_many :made_recommendations, through: :gift_responses, source: :product
+
 
 	def self.generate_session_token
 		SecureRandom::urlsafe_base64(16)
